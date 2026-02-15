@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UniRide - Find Your College Travel Partner</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="animated-bg"></div>
+
+    <header>
+        <div class="logo">UniRide</div>
+        <nav>
+            <a href="#home">Home</a>
+            <a href="#features">Features</a>
+            <a href="#about">About</a>
+            <a href="#contact">Contact</a>
+        </nav>
+    </header>
+
+    <section class="hero" id="home">
+        <h1>Share Your Commute</h1>
+        <p>Connect with fellow students from your locality and college. Save money, reduce carbon footprint, and make friends on the way!</p>
+    </section>
+
+    <div class="card-container">
+        <div class="option-card" onclick="openModal('owner')">
+            <div class="card-content">
+                <div class="card-icon">🚗</div>
+                <h2>Vehicle Owner</h2>
+                <p>Share your ride and split the costs with fellow students heading the same direction</p>
+                <ul class="features">
+                    <li>Earn money by sharing rides</li>
+                    <li>Choose your co-passengers</li>
+                    <li>Set your own schedule</li>
+                    <li>Reduce fuel costs</li>
+                </ul>
+                <button class="cta-button"><span>Register Vehicle →</span></button>
+            </div>
+        </div>
+
+        <div class="option-card" onclick="openModal('finder')">
+            <div class="card-content">
+                <div class="card-icon">🔍</div>
+                <h2>Find a Ride</h2>
+                <p>Looking for a comfortable ride to college? Find verified students from your area</p>
+                <ul class="features">
+                    <li>Save commute costs</li>
+                    <li>Safe & verified rides</li>
+                    <li>Flexible timing</li>
+                    <li>Meet new friends</li>
+                </ul>
+                <button class="cta-button"><span>Find Rides →</span></button>
+            </div>
+        </div>
+    </div>
+
+    <section class="features-section" id="features">
+        <h2>Why Choose UniRide?</h2>
+        <div class="features-grid">
+            <div class="feature-item">
+                <div class="feature-item-icon">🔒</div>
+                <h3>Safe & Secure</h3>
+                <p>Verified student profiles with college email authentication</p>
+            </div>
+            <div class="feature-item">
+                <div class="feature-item-icon">💰</div>
+                <h3>Save Money</h3>
+                <p>Split costs and reduce your daily commute expenses</p>
+            </div>
+            <div class="feature-item">
+                <div class="feature-item-icon">🌱</div>
+                <h3>Eco-Friendly</h3>
+                <p>Reduce carbon emissions by carpooling</p>
+            </div>
+            <div class="feature-item">
+                <div class="feature-item-icon">👥</div>
+                <h3>Build Network</h3>
+                <p>Connect with students from your college</p>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <p>&copy; 2024 UniRide. Making college commutes better, together.</p>
+    </footer>
+
+    <!-- Owner Modal -->
+    <div class="modal" id="ownerModal">
+        <div class="modal-content">
+            <button class="close-modal" onclick="closeModal('owner')">&times;</button>
+            <h2>Register Your Vehicle</h2>
+            <form id="ownerForm">
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" name="name" placeholder="Enter your name" required>
+                </div>
+                <div class="form-group">
+                    <label>College Email</label>
+                    <input type="email" name="email" placeholder="your.email@college.edu" required>
+                </div>
+                <div class="form-group">
+                    <label>College Name</label>
+                    <input type="text" name="college" placeholder="Enter your college" required>
+                </div>
+                <div class="form-group">
+                    <label>Vehicle Type</label>
+                    <select name="vehicleType" required>
+                        <option value="">Select vehicle type</option>
+                        <option value="car">Car</option>
+                        <option value="bike">Bike</option>
+                        <option value="scooter">Scooter</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Available Seats</label>
+                    <input type="number" name="seats" min="1" max="6" placeholder="Number of seats" required>
+                </div>
+                <div class="form-group">
+                    <label>Locality/Area</label>
+                    <input type="text" name="locality" placeholder="Your pickup area" required>
+                </div>
+                <div class="form-group">
+                    <label>Preferred Timing</label>
+                    <input type="time" name="timing" required>
+                </div>
+                <button type="submit" class="submit-btn">Register Vehicle</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Finder Modal -->
+    <div class="modal" id="finderModal">
+        <div class="modal-content">
+            <button class="close-modal" onclick="closeModal('finder')">&times;</button>
+            <h2>Find Your Ride</h2>
+            <form id="finderForm">
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" name="name" placeholder="Enter your name" required>
+                </div>
+                <div class="form-group">
+                    <label>College Email</label>
+                    <input type="email" name="email" placeholder="your.email@college.edu" required>
+                </div>
+                <div class="form-group">
+                    <label>College Name</label>
+                    <input type="text" name="college" placeholder="Enter your college" required>
+                </div>
+                <div class="form-group">
+                    <label>Your Locality/Area</label>
+                    <input type="text" name="locality" placeholder="Your area/locality" required>
+                </div>
+                <div class="form-group">
+                    <label>Preferred Timing</label>
+                    <input type="time" name="timing" required>
+                </div>
+                <div class="form-group">
+                    <label>Additional Preferences</label>
+                    <textarea name="preferences" rows="3" placeholder="Any specific requirements..."></textarea>
+                </div>
+                <button type="submit" class="submit-btn">Find Rides</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
