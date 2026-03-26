@@ -1,10 +1,10 @@
-<!DOCTYPE html>
++<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>UniRide - Find Your College Travel Partner</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
     <div class="animated-bg"></div>
@@ -14,7 +14,7 @@
         <nav>
             <a href="#home">Home</a>
             <a href="#features">Features</a>
-            <a href="#about">About</a>
+            <a href="/static/rides.html">Browse Rides</a>
             <a href="#contact">Contact</a>
         </nav>
     </header>
@@ -25,13 +25,13 @@
     </section>
 
     <div class="card-container">
-        <div class="option-card" onclick="openModal('owner')">
+        <div class="option-card" onclick="document.getElementById('ownerModal').classList.add('active')">
             <div class="card-content">
                 <div class="card-icon">🚗</div>
                 <h2>Vehicle Owner</h2>
                 <p>Share your ride and split the costs with fellow students heading the same direction</p>
                 <ul class="features">
-                    <li>Earn money by sharing rides or meet new friends </li>
+                    <li>Earn money by sharing rides or meet new friends</li>
                     <li>Choose your co-passengers</li>
                     <li>Set your own schedule</li>
                     <li>Reduce fuel costs</li>
@@ -40,7 +40,7 @@
             </div>
         </div>
 
-        <div class="option-card" onclick="openModal('finder')">
+        <div class="option-card" onclick="document.getElementById('finderModal').classList.add('active')">
             <div class="card-content">
                 <div class="card-icon">🔍</div>
                 <h2>Find a Ride</h2>
@@ -75,22 +75,26 @@
                 <p>Reduce carbon emissions by carpooling</p>
             </div>
             <div class="feature-item">
-                <div class="feature-item-icon">👥</div>
-                <h3>Build Network</h3>
-                <p>Connect with students from your college and locality </p>
+                <div class="feature-item-icon">🧠</div>
+                <h3>Smart Matching</h3>
+                <p>Greedy algorithm finds your best ride match instantly</p>
             </div>
         </div>
     </section>
 
-    <footer>
-        <p>&copy; 2026 UniRide. Making college commutes better, together. ©Aditya Sajwan </p>
+    <footer id="contact">
+        <p>&copy; 2026 UniRide. Making college commutes better, together. © Aditya Sajwan</p>
     </footer>
 
-    <!-- Owner Modal -->
+    <!-- ── Owner Modal ── -->
     <div class="modal" id="ownerModal">
         <div class="modal-content">
-            <button class="close-modal" onclick="closeModal('owner')">&times;</button>
+            <button class="close-modal" onclick="document.getElementById('ownerModal').classList.remove('active')">&times;</button>
             <h2>Register Your Vehicle</h2>
+
+            <!-- Flash messages from server -->
+            <div id="ownerMsg" class="flash-msg" style="display:none"></div>
+
             <form id="ownerForm">
                 <div class="form-group">
                     <label>Full Name</label>
@@ -108,9 +112,9 @@
                     <label>Vehicle Type</label>
                     <select name="vehicleType" required>
                         <option value="">Select vehicle type</option>
-                        <option value="car">Car</option>
-                        <option value="bike">Bike</option>
-                        <option value="scooter">Scooter</option>
+                        <option value="Car">Car</option>
+                        <option value="Bike">Bike</option>
+                        <option value="Scooter">Scooter</option>
                     </select>
                 </div>
                 <div class="form-group">
@@ -118,7 +122,7 @@
                     <input type="number" name="seats" min="1" max="6" placeholder="Number of seats" required>
                 </div>
                 <div class="form-group">
-                    <label>Locality/Area</label>
+                    <label>Locality / Area</label>
                     <input type="text" name="locality" placeholder="Your pickup area" required>
                 </div>
                 <div class="form-group">
@@ -130,11 +134,14 @@
         </div>
     </div>
 
-    <!-- Finder Modal -->
+    <!-- ── Finder Modal ── -->
     <div class="modal" id="finderModal">
         <div class="modal-content">
-            <button class="close-modal" onclick="closeModal('finder')">&times;</button>
+            <button class="close-modal" onclick="document.getElementById('finderModal').classList.remove('active')">&times;</button>
             <h2>Find Your Ride</h2>
+
+            <div id="finderMsg" class="flash-msg" style="display:none"></div>
+
             <form id="finderForm">
                 <div class="form-group">
                     <label>Full Name</label>
@@ -149,7 +156,7 @@
                     <input type="text" name="college" placeholder="Enter your college" required>
                 </div>
                 <div class="form-group">
-                    <label>Your Locality/Area</label>
+                    <label>Your Locality / Area</label>
                     <input type="text" name="locality" placeholder="Your area/locality" required>
                 </div>
                 <div class="form-group">
@@ -162,9 +169,81 @@
                 </div>
                 <button type="submit" class="submit-btn">Find Rides</button>
             </form>
+
+            <!-- Results shown here after search -->
+            <div id="matchResults"></div>
         </div>
     </div>
 
-    <script src="script.js"></script>
+    <script>
+    // ──  JS for fetch calls & modal toggle ──
+
+    // Close modal clicking outside
+    document.querySelectorAll('.modal').forEach(m => {
+        m.addEventListener('click', e => {
+            if (e.target === m) m.classList.remove('active');
+        });
+    });
+
+    document.addEventListener('keydown', e => {
+        if (e.key === 'Escape')
+            document.querySelectorAll('.modal').forEach(m => m.classList.remove('active'));
+    });
+
+    // ── Owner form: fetch POST ──
+    document.getElementById('ownerForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const data = Object.fromEntries(new FormData(this));
+        const res = await fetch('/api/register-owner', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(data)
+        });
+        const result = await res.json();
+        const msg = document.getElementById('ownerMsg');
+        msg.style.display = 'block';
+        msg.className = 'flash-msg ' + (result.success ? 'success' : 'error');
+        msg.textContent = result.message;
+        if (result.success) this.reset();
+    });
+
+    // ── Finder form: fetch POST + show matches ──
+    document.getElementById('finderForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const data = Object.fromEntries(new FormData(this));
+        const res = await fetch('/api/find-rides', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(data)
+        });
+        const result = await res.json();
+        const box = document.getElementById('matchResults');
+
+        if (!result.matches || result.matches.length === 0) {
+            box.innerHTML = '<p class="no-match">No rides found for your college and area yet. Try again later!</p>';
+            return;
+        }
+
+        box.innerHTML = '<h3 style="margin:1.5rem 0 1rem;color:var(--text)">🎯 Best Matches (Greedy Algorithm)</h3>' +
+            result.matches.map(m => `
+            <div class="match-card">
+                <div class="match-header">
+                    <span class="match-name">${m.owner.name}</span>
+                    <span class="match-score">Score: ${(m.score * 100).toFixed(0)}%</span>
+                </div>
+                <div class="match-details">
+                    <span>🚗 ${m.owner.vehicleType} &nbsp;|&nbsp; 💺 ${m.owner.seats} seats</span>
+                    <span>📍 ${m.owner.locality} &nbsp;|&nbsp; ⏰ ${m.owner.timing}</span>
+                    <span>📧 ${m.owner.email}</span>
+                </div>
+                <div class="match-bars">
+                    <div class="bar-label">Locality match</div>
+                    <div class="bar-track"><div class="bar-fill" style="width:${m.locality_match}%"></div></div>
+                    <div class="bar-label">Time match</div>
+                    <div class="bar-track"><div class="bar-fill time" style="width:${m.time_match}%"></div></div>
+                </div>
+            </div>`).join('');
+    });
+    </script>
 </body>
 </html>
