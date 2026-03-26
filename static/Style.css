@@ -26,7 +26,6 @@ body {
     line-height: 1.6;
 }
 
-/* Animated Background */
 .animated-bg {
     position: fixed;
     width: 100%;
@@ -67,7 +66,6 @@ body {
     66% { transform: translate(-20px, 20px) rotate(240deg); }
 }
 
-/* Header */
 header {
     padding: 1.5rem 5%;
     display: flex;
@@ -83,14 +81,8 @@ header {
 }
 
 @keyframes slideDown {
-    from {
-        transform: translateY(-100%);
-        opacity: 0;
-    }
-    to {
-        transform: translateY(0);
-        opacity: 1;
-    }
+    from { transform: translateY(-100%); opacity: 0; }
+    to   { transform: translateY(0);     opacity: 1; }
 }
 
 .logo {
@@ -113,14 +105,10 @@ header {
 
 @keyframes carMove {
     0%, 100% { transform: translateX(0); }
-    50% { transform: translateX(10px); }
+    50%       { transform: translateX(10px); }
 }
 
-nav {
-    display: flex;
-    gap: 2rem;
-    align-items: center;
-}
+nav { display: flex; gap: 2rem; align-items: center; }
 
 nav a {
     color: var(--text-muted);
@@ -132,23 +120,15 @@ nav a {
 nav a::after {
     content: '';
     position: absolute;
-    bottom: -5px;
-    left: 0;
-    width: 0;
-    height: 2px;
+    bottom: -5px; left: 0;
+    width: 0; height: 2px;
     background: var(--primary);
     transition: width 0.3s;
 }
 
-nav a:hover {
-    color: var(--text);
-}
+nav a:hover { color: var(--text); }
+nav a:hover::after { width: 100%; }
 
-nav a:hover::after {
-    width: 100%;
-}
-
-/* Hero Section */
 .hero {
     text-align: center;
     padding: 6rem 5% 4rem;
@@ -156,14 +136,8 @@ nav a:hover::after {
 }
 
 @keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(30px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+    from { opacity: 0; transform: translateY(30px); }
+    to   { opacity: 1; transform: translateY(0); }
 }
 
 .hero h1 {
@@ -179,19 +153,16 @@ nav a:hover::after {
 
 @keyframes gradientShift {
     0%, 100% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
+    50%       { background-position: 100% 50%; }
 }
 
 .hero p {
     font-size: 1.3rem;
     color: var(--text-muted);
-    margin-bottom: 3rem;
     max-width: 600px;
-    margin-left: auto;
-    margin-right: auto;
+    margin: 0 auto;
 }
 
-/* Card Selection */
 .card-container {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
@@ -213,21 +184,14 @@ nav a:hover::after {
     animation: fadeInUp 0.8s ease-out backwards;
 }
 
-.option-card:nth-child(1) {
-    animation-delay: 0.2s;
-}
-
-.option-card:nth-child(2) {
-    animation-delay: 0.4s;
-}
+.option-card:nth-child(1) { animation-delay: 0.2s; }
+.option-card:nth-child(2) { animation-delay: 0.4s; }
 
 .option-card::before {
     content: '';
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
     background: linear-gradient(135deg, var(--primary), var(--secondary));
     opacity: 0;
     transition: opacity 0.4s;
@@ -240,14 +204,9 @@ nav a:hover::after {
     box-shadow: 0 20px 60px rgba(99, 102, 241, 0.3);
 }
 
-.option-card:hover::before {
-    opacity: 0.1;
-}
+.option-card:hover::before { opacity: 0.1; }
 
-.card-content {
-    position: relative;
-    z-index: 1;
-}
+.card-content { position: relative; z-index: 1; }
 
 .card-icon {
     font-size: 4rem;
@@ -258,35 +217,14 @@ nav a:hover::after {
 
 @keyframes bounce {
     0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-10px); }
+    50%       { transform: translateY(-10px); }
 }
 
-.option-card:hover .card-icon {
-    animation: rotate 0.6s ease-in-out;
-}
+.option-card h2 { font-size: 2rem; margin-bottom: 1rem; color: var(--text); }
 
-@keyframes rotate {
-    0% { transform: rotate(0deg) scale(1); }
-    50% { transform: rotate(10deg) scale(1.1); }
-    100% { transform: rotate(0deg) scale(1); }
-}
+.option-card p { color: var(--text-muted); margin-bottom: 2rem; font-size: 1.1rem; }
 
-.option-card h2 {
-    font-size: 2rem;
-    margin-bottom: 1rem;
-    color: var(--text);
-}
-
-.option-card p {
-    color: var(--text-muted);
-    margin-bottom: 2rem;
-    font-size: 1.1rem;
-}
-
-.features {
-    list-style: none;
-    margin-bottom: 2rem;
-}
+.features { list-style: none; margin-bottom: 2rem; }
 
 .features li {
     padding: 0.7rem 0;
@@ -304,14 +242,8 @@ nav a:hover::after {
 .features li:nth-child(4) { animation-delay: 0.9s; }
 
 @keyframes fadeInLeft {
-    from {
-        opacity: 0;
-        transform: translateX(-20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
+    from { opacity: 0; transform: translateX(-20px); }
+    to   { opacity: 1; transform: translateX(0); }
 }
 
 .features li::before {
@@ -319,8 +251,7 @@ nav a:hover::after {
     background: linear-gradient(135deg, var(--primary), var(--secondary));
     color: white;
     border-radius: 50%;
-    width: 24px;
-    height: 24px;
+    width: 24px; height: 24px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -343,39 +274,12 @@ nav a:hover::after {
     overflow: hidden;
 }
 
-.cta-button::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 0;
-    height: 0;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.3);
-    transform: translate(-50%, -50%);
-    transition: width 0.6s, height 0.6s;
-}
-
-.cta-button:hover::before {
-    width: 300px;
-    height: 300px;
-}
-
 .cta-button:hover {
     transform: scale(1.05);
     box-shadow: 0 10px 30px rgba(99, 102, 241, 0.4);
 }
 
-.cta-button span {
-    position: relative;
-    z-index: 1;
-}
-
-/* Features Section */
-.features-section {
-    padding: 5rem 5%;
-    text-align: center;
-}
+.features-section { padding: 5rem 5%; text-align: center; }
 
 .features-section h2 {
     font-size: 2.5rem;
@@ -408,21 +312,10 @@ nav a:hover::after {
     box-shadow: 0 10px 30px rgba(99, 102, 241, 0.2);
 }
 
-.feature-item-icon {
-    font-size: 3rem;
-    margin-bottom: 1rem;
-}
+.feature-item-icon { font-size: 3rem; margin-bottom: 1rem; }
+.feature-item h3   { margin-bottom: 0.5rem; color: var(--text); }
+.feature-item p    { color: var(--text-muted); }
 
-.feature-item h3 {
-    margin-bottom: 0.5rem;
-    color: var(--text);
-}
-
-.feature-item p {
-    color: var(--text-muted);
-}
-
-/* Footer */
 footer {
     text-align: center;
     padding: 2rem 5%;
@@ -431,67 +324,49 @@ footer {
     color: var(--text-muted);
 }
 
-/* Modal */
+/* ── Modal ── */
 .modal {
     display: none;
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
     background: rgba(0, 0, 0, 0.8);
     backdrop-filter: blur(5px);
     z-index: 1000;
     align-items: center;
     justify-content: center;
-    animation: fadeIn 0.3s;
 }
 
-@keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-}
-
-.modal.active {
-    display: flex;
-}
+.modal.active { display: flex; }
 
 .modal-content {
     background: var(--card-bg);
     padding: 3rem;
     border-radius: 24px;
-    max-width: 500px;
+    max-width: 540px;
     width: 90%;
     border: 2px solid var(--border);
-    animation: scaleIn 0.3s;
     position: relative;
     max-height: 90vh;
     overflow-y: auto;
+    animation: scaleIn 0.3s;
 }
 
 @keyframes scaleIn {
-    from {
-        transform: scale(0.8);
-        opacity: 0;
-    }
-    to {
-        transform: scale(1);
-        opacity: 1;
-    }
+    from { transform: scale(0.8); opacity: 0; }
+    to   { transform: scale(1);   opacity: 1; }
 }
 
 .close-modal {
     position: absolute;
-    top: 1.5rem;
-    right: 1.5rem;
+    top: 1.5rem; right: 1.5rem;
     background: none;
     border: none;
     color: var(--text-muted);
     font-size: 2rem;
     cursor: pointer;
     transition: all 0.3s;
-    width: 40px;
-    height: 40px;
+    width: 40px; height: 40px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -504,20 +379,11 @@ footer {
     transform: rotate(90deg);
 }
 
-.modal-content h2 {
-    margin-bottom: 2rem;
-    color: var(--text);
-}
+.modal-content h2 { margin-bottom: 1.5rem; color: var(--text); }
 
-.form-group {
-    margin-bottom: 1.5rem;
-}
+.form-group { margin-bottom: 1.5rem; }
 
-.form-group label {
-    display: block;
-    margin-bottom: 0.5rem;
-    color: var(--text-muted);
-}
+.form-group label { display: block; margin-bottom: 0.5rem; color: var(--text-muted); }
 
 .form-group input,
 .form-group select,
@@ -530,6 +396,7 @@ footer {
     color: var(--text);
     font-size: 1rem;
     transition: all 0.3s;
+    font-family: inherit;
 }
 
 .form-group input:focus,
@@ -558,38 +425,106 @@ footer {
     box-shadow: 0 10px 30px rgba(99, 102, 241, 0.4);
 }
 
-/* Responsive */
+/* ── Flash messages ── */
+.flash-msg {
+    padding: 0.9rem 1.2rem;
+    border-radius: 10px;
+    margin-bottom: 1.2rem;
+    font-size: 0.95rem;
+}
+
+.flash-msg.success {
+    background: rgba(16, 185, 129, 0.15);
+    border: 1px solid var(--success);
+    color: #6ee7b7;
+}
+
+.flash-msg.error {
+    background: rgba(239, 68, 68, 0.15);
+    border: 1px solid #ef4444;
+    color: #fca5a5;
+}
+
+/* ── Match results ── */
+.match-card {
+    background: var(--bg-dark);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 1.2rem 1.4rem;
+    margin-top: 1rem;
+    transition: border-color 0.3s;
+}
+
+.match-card:hover { border-color: var(--primary); }
+
+.match-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.6rem;
+}
+
+.match-name { font-weight: 600; font-size: 1.05rem; color: var(--text); }
+
+.match-score {
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    color: white;
+    padding: 0.25rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.match-details {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    margin-bottom: 0.8rem;
+}
+
+.no-match {
+    color: var(--text-muted);
+    text-align: center;
+    padding: 1.5rem;
+    font-size: 0.95rem;
+}
+
+/* ── Progress bars for match quality ── */
+.bar-label {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-bottom: 2px;
+    margin-top: 6px;
+}
+
+.bar-track {
+    background: var(--border);
+    border-radius: 6px;
+    height: 7px;
+    overflow: hidden;
+}
+
+.bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary), var(--secondary));
+    border-radius: 6px;
+    transition: width 0.8s ease;
+}
+
+.bar-fill.time {
+    background: linear-gradient(90deg, var(--secondary), var(--accent));
+}
+
+/* ── Responsive ── */
 @media (max-width: 768px) {
-    .hero h1 {
-        font-size: 2.5rem;
-    }
-
-    .hero p {
-        font-size: 1.1rem;
-    }
-
-    .card-container {
-        grid-template-columns: 1fr;
-        padding: 2rem 1rem;
-    }
-
-    .option-card {
-        padding: 2rem;
-    }
-
-    nav {
-        gap: 1rem;
-    }
-
-    .features-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .logo {
-        font-size: 1.5rem;
-    }
-
-    nav a {
-        font-size: 0.9rem;
-    }
+    .hero h1              { font-size: 2.5rem; }
+    .hero p               { font-size: 1.1rem; }
+    .card-container       { grid-template-columns: 1fr; padding: 2rem 1rem; }
+    .option-card          { padding: 2rem; }
+    nav                   { gap: 1rem; }
+    .features-grid        { grid-template-columns: 1fr; }
+    .logo                 { font-size: 1.5rem; }
+    nav a                 { font-size: 0.9rem; }
 }
