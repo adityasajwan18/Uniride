@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UniRide - Browse All Rides</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="animated-bg"></div>
+
+    <header>
+        <div class="logo">UniRide</div>
+        <nav>
+            <a href="/static/index.html">Home</a>
+            <a href="/static/rides.html">Browse Rides</a>
+        </nav>
+    </header>
+
+    <section class="hero" style="padding: 3rem 5% 2rem;">
+        <h1 style="font-size:2.5rem;">All Available Rides</h1>
+        <p>Sorted by departure time using <strong>Merge Sort</strong> algorithm</p>
+    </section>
+
+    <div style="max-width:900px;margin:0 auto;padding:1rem 5% 4rem;">
+        <div id="ridesList">
+            <p style="color:var(--text-muted);text-align:center;">Loading rides...</p>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2026 UniRide. Making college commutes better, together.</p>
+    </footer>
+
+    <script>
+    async function loadRides() {
+        const res = await fetch('/api/all-rides');
+        const data = await res.json();
+        const box = document.getElementById('ridesList');
+
+        if (!data.rides || data.rides.length === 0) {
+            box.innerHTML = '<p style="color:var(--text-muted);text-align:center;margin-top:3rem;">No rides registered yet. Be the first!</p>';
+            return;
+        }
+
+        box.innerHTML = data.rides.map(r => `
+        <div class="match-card" style="margin-bottom:1.2rem;">
+            <div class="match-header">
+                <span class="match-name">🚗 ${r.name}</span>
+                <span class="match-score">${r.timing}</span>
+            </div>
+            <div class="match-details">
+                <span>${r.vehicleType} &nbsp;|&nbsp; 💺 ${r.seats} seats available</span>
+                <span>📍 ${r.locality} &nbsp;|&nbsp; 🏫 ${r.college}</span>
+                <span>📧 ${r.email}</span>
+            </div>
+        </div>`).join('');
+    }
+
+    loadRides();
+    </script>
+</body>
+</html>
