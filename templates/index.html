@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>UniRide — Smarter rides around Dehradun</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+</head>
+<body>
+
+  <header class="topbar">
+    <div class="brand">
+      <span class="logo-dot"></span>
+      <span class="brand-name">UniRide</span>
+    </div>
+    <nav class="nav">
+      <a href="/" class="active">Home</a>
+      <a href="/dashboard">Dashboard</a>
+      <a href="/route">Route Map</a>
+    </nav>
+  </header>
+
+  <main class="container">
+    <section class="hero">
+      <h1>Smarter rides around Dehradun.</h1>
+      <p class="hero-sub">
+        Find optimized student rides to GEHU using real route algorithms — locality matching, shortest paths, and greedy ranking, all in one place.
+      </p>
+    </section>
+
+    <section class="panel">
+      <div class="tabs">
+        <button class="tab active" data-tab="find">Find Ride</button>
+        <button class="tab" data-tab="add">Add Ride</button>
+      </div>
+
+      <!-- ========== Find Ride ========== -->
+      <div class="tab-content" id="tab-find">
+        <div class="form-grid">
+          <div class="field">
+            <label>Your Location</label>
+            <select id="find-source">
+              <option value="">Select pickup point</option>
+              <option>Kargi Chowk</option>
+              <option>ISBT</option>
+              <option>Subhash Nagar</option>
+              <option>Balliwala</option>
+              <option>Clock Tower</option>
+              <option>Prem Nagar</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Destination</label>
+            <select id="find-destination">
+              <option value="GEHU">GEHU</option>
+            </select>
+          </div>
+          <div class="field field-action">
+            <button class="btn-primary" id="btn-find">Find Rides</button>
+          </div>
+        </div>
+
+        <div class="results" id="find-results">
+          <div class="empty-state">
+            <p>No search yet — pick a location to see optimized rides.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========== Add Ride ========== -->
+      <div class="tab-content hidden" id="tab-add">
+        <div class="form-grid">
+          <div class="field">
+            <label>Driver Name</label>
+            <input type="text" id="add-driver" placeholder="e.g. Aarav Sharma" />
+          </div>
+          <div class="field">
+            <label>Source</label>
+            <select id="add-source">
+              <option value="">Select source</option>
+              <option>Kargi Chowk</option>
+              <option>ISBT</option>
+              <option>Subhash Nagar</option>
+              <option>Balliwala</option>
+              <option>Clock Tower</option>
+              <option>Prem Nagar</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Destination</label>
+            <select id="add-destination">
+              <option value="GEHU">GEHU</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Time</label>
+            <input type="time" id="add-time" />
+          </div>
+          <div class="field">
+            <label>Seats</label>
+            <input type="number" id="add-seats" min="1" max="6" value="2" />
+          </div>
+          <div class="field field-action">
+            <button class="btn-primary" id="btn-add">Publish Ride</button>
+          </div>
+        </div>
+        <div id="add-feedback" class="feedback"></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <span>© UniRide · A DAA project · GEHU Dehradun</span>
+  </footer>
+
+  <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>

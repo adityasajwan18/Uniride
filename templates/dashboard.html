@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>UniRide — Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+</head>
+<body>
+
+  <header class="topbar">
+    <div class="brand">
+      <span class="logo-dot"></span>
+      <span class="brand-name">UniRide</span>
+    </div>
+    <nav class="nav">
+      <a href="/">Home</a>
+      <a href="/dashboard" class="active">Dashboard</a>
+      <a href="/route">Route Map</a>
+    </nav>
+  </header>
+
+  <main class="container">
+    <section class="page-head">
+      <h2>Operations Dashboard</h2>
+      <p class="muted">Live stats from the UniRide ride pool.</p>
+    </section>
+
+    <section class="stat-grid" id="stat-grid">
+      <div class="stat-card">
+        <span class="stat-label">Total Rides</span>
+        <span class="stat-value" id="stat-total">—</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-label">Active Routes</span>
+        <span class="stat-value" id="stat-routes">—</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-label">Algorithms in Use</span>
+        <span class="stat-value" id="stat-algos">—</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-label">Destination College</span>
+        <span class="stat-value">GEHU</span>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head">
+        <h3>Recent Rides</h3>
+        <span class="muted">Latest 6 entries</span>
+      </div>
+      <table class="data-table" id="recent-table">
+        <thead>
+          <tr>
+            <th>Driver</th><th>Source</th><th>Destination</th>
+            <th>Time</th><th>Seats</th><th>Distance (km)</th>
+          </tr>
+        </thead>
+        <tbody><tr><td colspan="6" class="muted">Loading…</td></tr></tbody>
+      </table>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head">
+        <h3>Algorithms Powering UniRide</h3>
+      </div>
+      <ul class="algo-list">
+        <li><strong>Rabin-Karp</strong> — locality string matching for pickup source.</li>
+        <li><strong>Dijkstra</strong> — shortest path across the Dehradun route graph.</li>
+        <li><strong>Merge Sort</strong> — stable sort of rides by distance.</li>
+        <li><strong>Greedy</strong> — best-ride scoring using distance, seats, locality.</li>
+        <li><strong>Hashing</strong> — O(1) ride lookup index.</li>
+        <li><strong>Priority Queue</strong> — top-K nearest ride extraction via heap.</li>
+      </ul>
+    </section>
+  </main>
+
+  <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>

@@ -1,175 +1,192 @@
-from flask import Flask, request, jsonify, send_from_directory
-import json
-import os
-from datetime import datetime
+from flask import Flask, render_template, request, jsonify
+import mysql.connector
+from mysql.connector import Error
 
-app = Flask(__name__, static_folder='static')
+from algorithms.rabin_karp import match_locality
+from algorithms.merge_sort import merge_sort_rides
+from algorithms.dijkstra import shortest_route, DEHRADUN_GRAPH
+from algorithms.hashing import RideHashIndex
+from algorithms.priority_queue import nearest_rides
+from algorithms.greedy import greedy_best_rides
 
-DATA_FILE = 'data.json'
+app = Flask(__name__)
 
-# ─────────────────────────────────────────────
-#  Data helpers
-# ─────────────────────────────────────────────
+# ---------- MySQL Config ----------
+DB_CONFIG = {
+    "host": "localhost",
+    "user": "root",
+    "password": "root",          # change to your local password
+    "database": "uniride",
+}
 
-def load_data():
-    if not os.path.exists(DATA_FILE):
-        return {"owners": [], "finders": []}
-    with open(DATA_FILE, 'r') as f:
-        return json.load(f)
 
-def save_data(data):
-    with open(DATA_FILE, 'w') as f:
-        json.dump(data, f, indent=2)
+def get_db():
+    return mysql.connector.connect(**DB_CONFIG)
 
-# ─────────────────────────────────────────────
-#  DAA ALGORITHM 1: Greedy Ride Matching
-#  Match finders to owners based on:
-#    - Same college  (must match)
-#    - Locality similarity (scored)
-#    - Time proximity (scored)
-#  Returns top matches sorted by score
-# ─────────────────────────────────────────────
 
-def time_to_minutes(t):
-    """Convert HH:MM string to total minutes."""
+def fetch_all_rides():
+    """Pull rides from MySQL, return list of dicts."""
     try:
-        h, m = map(int, t.split(':'))
-        return h * 60 + m
-    except:
-        return 0
-
-def locality_score(loc1, loc2):
-    """
-    Simple word-overlap score between two locality strings.
-    DAA concept: String matching / similarity scoring.
-    """
-    words1 = set(loc1.lower().split())
-    words2 = set(loc2.lower().split())
-    common = words1 & words2
-    if not common:
-        return 0
-    # Jaccard similarity
-    return len(common) / len(words1 | words2)
-
-def time_score(t1, t2, max_diff_minutes=60):
-    """
-    Score based on how close departure times are.
-    DAA concept: Scoring/ranking function.
-    """
-    diff = abs(time_to_minutes(t1) - time_to_minutes(t2))
-    if diff > max_diff_minutes:
-        return 0
-    return 1 - (diff / max_diff_minutes)
-
-def greedy_match(finder, owners):
-    """
-    DAA: Greedy algorithm — pick the best local choice at each step.
-    Scores each owner and returns top matches sorted by score.
-    """
-    matches = []
-    for owner in owners:
-        # Hard constraint: same college
-        if owner['college'].lower() != finder['college'].lower():
-            continue
-        # Skip if no seats
-        if int(owner.get('seats', 0)) <= 0:
-            continue
-
-        loc = locality_score(finder['locality'], owner['locality'])
-        time = time_score(finder['timing'], owner['timing'])
-
-        # Weighted score: locality matters more than time
-        score = round((loc * 0.6) + (time * 0.4), 3)
-
-        if score > 0:
-            matches.append({
-                "owner": owner,
-                "score": score,
-                "locality_match": round(loc * 100),
-                "time_match": round(time * 100)
-            })
-
-    # DAA: Sort by score descending (greedy best-first selection)
-    matches.sort(key=lambda x: x['score'], reverse=True)
-    return matches[:5]  # Return top 5
-
-
-# ─────────────────────────────────────────────
-#  DAA ALGORITHM 2: Merge Sort for ride listing
-#  Sort all rides by time for the dashboard
-# ─────────────────────────────────────────────
-
-def merge_sort_by_time(rides):
-    """
-    DAA: Merge Sort — O(n log n) sorting algorithm.
-    Sorts ride listings by departure time.
-    """
-    if len(rides) <= 1:
+        conn = get_db()
+        cur = conn.cursor(dictionary=True)
+        cur.execute("SELECT id, driver_name, source, destination, time, seats, distance FROM rides")
+        rides = cur.fetchall()
+        cur.close(); conn.close()
+        # Normalise time field to string
+        for r in rides:
+            r["time"] = str(r["time"])
         return rides
-
-    mid = len(rides) // 2
-    left = merge_sort_by_time(rides[:mid])
-    right = merge_sort_by_time(rides[mid:])
-
-    return merge(left, right)
-
-def merge(left, right):
-    result = []
-    i = j = 0
-    while i < len(left) and j < len(right):
-        if time_to_minutes(left[i]['timing']) <= time_to_minutes(right[j]['timing']):
-            result.append(left[i])
-            i += 1
-        else:
-            result.append(right[j])
-            j += 1
-    result.extend(left[i:])
-    result.extend(right[j:])
-    return result
+    except Error as e:
+        print("DB error:", e)
+        return []
 
 
-# ─────────────────────────────────────────────
-#  Routes
-# ─────────────────────────────────────────────
-
-@app.route('/')
+# ============================================================
+# Page Routes
+# ============================================================
+@app.route("/")
 def index():
-    return send_from_directory('static', 'index.html')
+    return render_template("index.html")
 
-@app.route('/rides')
-def rides_page():
-    return send_from_directory('static', 'rides.html')
 
-@app.route('/api/register-owner', methods=['POST'])
-def register_owner():
-    data = load_data()
-    owner = request.json
-    owner['id'] = len(data['owners']) + 1
-    owner['registered_at'] = datetime.now().strftime("%Y-%m-%d %H:%M")
-    data['owners'].append(owner)
-    save_data(data)
-    return jsonify({"success": True, "message": "Vehicle registered successfully!"})
+@app.route("/dashboard")
+def dashboard():
+    return render_template("dashboard.html")
 
-@app.route('/api/find-rides', methods=['POST'])
+
+@app.route("/route")
+def route_page():
+    return render_template("route.html", graph=DEHRADUN_GRAPH)
+
+
+# ============================================================
+# API: Add Ride
+# ============================================================
+@app.route("/add-ride", methods=["POST"])
+def add_ride():
+    data = request.get_json(force=True)
+    driver = data.get("driver_name", "").strip()
+    source = data.get("source", "").strip()
+    destination = data.get("destination", "GEHU").strip()
+    time_val = data.get("time", "").strip()
+    seats = int(data.get("seats", 1))
+
+    if not (driver and source and time_val):
+        return jsonify({"success": False, "message": "Missing required fields."}), 400
+
+    # Pre-compute distance using Dijkstra so the dashboard has it ready
+    route_info = shortest_route(source, destination)
+    distance = route_info["distance"]
+
+    try:
+        conn = get_db()
+        cur = conn.cursor()
+        cur.execute(
+            """INSERT INTO rides (driver_name, source, destination, time, seats, distance)
+               VALUES (%s, %s, %s, %s, %s, %s)""",
+            (driver, source, destination, time_val, seats, distance),
+        )
+        conn.commit()
+        ride_id = cur.lastrowid
+        cur.close(); conn.close()
+    except Error as e:
+        return jsonify({"success": False, "message": str(e)}), 500
+
+    return jsonify({
+        "success": True,
+        "message": "Ride added successfully.",
+        "ride_id": ride_id,
+        "distance": distance,
+    })
+
+
+# ============================================================
+# API: Find Rides
+# ============================================================
+@app.route("/find-rides", methods=["POST"])
 def find_rides():
-    data = load_data()
-    finder = request.json
-    # Save finder
-    finder['id'] = len(data['finders']) + 1
-    finder['searched_at'] = datetime.now().strftime("%Y-%m-%d %H:%M")
-    data['finders'].append(finder)
-    save_data(data)
+    data = request.get_json(force=True)
+    user_source = data.get("source", "").strip()
+    destination = data.get("destination", "GEHU").strip()
 
-    # Run greedy matching algorithm
-    matches = greedy_match(finder, data['owners'])
-    return jsonify({"success": True, "matches": matches})
+    if not user_source:
+        return jsonify({"success": False, "message": "Source location required."}), 400
 
-@app.route('/api/all-rides', methods=['GET'])
-def all_rides():
-    data = load_data()
-    # Return merge-sorted rides
-    sorted_rides = merge_sort_by_time(data['owners'])
-    return jsonify({"rides": sorted_rides})
+    all_rides = fetch_all_rides()
+    if not all_rides:
+        return jsonify({"success": True, "rides": [], "route": None})
 
-if __name__ == '__main__':
-    app.run(debug=True, port=5000)
+    # 1. Build hash index for O(1) lookups
+    index = RideHashIndex()
+    index.build(all_rides)
+
+    # 2. Rabin-Karp locality filter
+    matched = [r for r in all_rides if match_locality(user_source, r["source"])]
+    if not matched:
+        matched = all_rides  # fallback so user always sees something
+
+    # 3. Dijkstra — attach optimized route+distance to each ride
+    for ride in matched:
+        route_info = shortest_route(ride["source"], destination)
+        ride["distance"] = route_info["distance"] or ride["distance"]
+        ride["path"] = route_info["path"]
+
+    # 4. Merge sort by distance
+    sorted_rides = merge_sort_rides(matched, key="distance")
+
+    # 5. Greedy best-ride ranking on the sorted set
+    ranked = greedy_best_rides(sorted_rides, user_source)
+
+    # 6. Priority queue — surface top-K nearest
+    top_nearest = nearest_rides(ranked, k=5)
+
+    # 7. Best overall route summary (from user's source)
+    overall_route = shortest_route(user_source, destination)
+
+    return jsonify({
+        "success": True,
+        "rides": top_nearest,
+        "route": overall_route,
+        "algorithms_used": [
+            "Rabin-Karp (locality match)",
+            "Hashing (O(1) ride index)",
+            "Dijkstra (route optimization)",
+            "Merge Sort (distance sort)",
+            "Greedy (best-ride scoring)",
+            "Priority Queue (nearest K)",
+        ],
+    })
+
+
+# ============================================================
+# API: Dashboard Stats
+# ============================================================
+@app.route("/stats")
+def stats():
+    try:
+        conn = get_db()
+        cur = conn.cursor(dictionary=True)
+        cur.execute("SELECT COUNT(*) AS total FROM rides")
+        total = cur.fetchone()["total"]
+        cur.execute("SELECT COUNT(DISTINCT source) AS routes FROM rides")
+        routes = cur.fetchone()["routes"]
+        cur.execute("""SELECT id, driver_name, source, destination, time, seats, distance
+                       FROM rides ORDER BY created_at DESC LIMIT 6""")
+        recent = cur.fetchall()
+        for r in recent:
+            r["time"] = str(r["time"])
+        cur.close(); conn.close()
+    except Error as e:
+        return jsonify({"success": False, "message": str(e)}), 500
+
+    return jsonify({
+        "success": True,
+        "total_rides": total,
+        "active_routes": routes,
+        "algorithms_used": 6,
+        "recent_rides": recent,
+    })
+
+
+if __name__ == "__main__":
+    app.run(debug=True)
