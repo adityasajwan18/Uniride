@@ -12,8 +12,8 @@ DEHRADUN_GRAPH = {
     "Subhash Nagar": {"ISBT": 2, "Kargi Chowk": 5, "Balliwala": 6, "GEHU": 1},
     "Balliwala":     {"Subhash Nagar": 6, "Prem Nagar": 8, "GEHU": 8},
     "Clock Tower":   {"ISBT": 8, "Prem Nagar": 9},
-    "Prem Nagar":    {"Balliwala": 8, "Clock Tower": 9, "GEHU": 3},
-    "GEHU":          {"Prem Nagar": 3, "Balliwala": 6, "Subhash Nagar": 1},
+    "Prem Nagar":    {"Balliwala": 8, "Clock Tower": 9, "GEHU": 10},
+    "GEHU":          {"Prem Nagar": 10, "Balliwala": 6, "Subhash Nagar": 1},
 }
 
 
