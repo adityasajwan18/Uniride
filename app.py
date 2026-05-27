@@ -15,7 +15,7 @@ app = Flask(__name__)
 DB_CONFIG = {
     "host": "localhost",
     "user": "root",
-    "password": "root",          # change to your local password
+    "password": "Adi@18042004",          
     "database": "uniride",
 }
 
