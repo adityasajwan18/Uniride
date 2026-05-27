@@ -7,13 +7,13 @@ import heapq
 
 # Weighted graph of key Dehradun locations (distances in km, approximate)
 DEHRADUN_GRAPH = {
-    "Kargi Chowk":   {"ISBT": 3, "Subhash Nagar": 6},
-    "ISBT":          {"Kargi Chowk": 3, "Subhash Nagar": 4, "Clock Tower": 6},
-    "Subhash Nagar": {"ISBT": 4, "Kargi Chowk": 6, "Balliwala": 3, "GEHU": 8},
-    "Balliwala":     {"Subhash Nagar": 3, "Prem Nagar": 4, "GEHU": 6},
-    "Clock Tower":   {"ISBT": 6, "Prem Nagar": 9},
-    "Prem Nagar":    {"Balliwala": 4, "Clock Tower": 9, "GEHU": 3},
-    "GEHU":          {"Prem Nagar": 3, "Balliwala": 6, "Subhash Nagar": 8},
+    "Kargi Chowk":   {"ISBT": 3, "Subhash Nagar": 5},
+    "ISBT":          {"Kargi Chowk": 3, "Subhash Nagar": 2, "Clock Tower": 8},
+    "Subhash Nagar": {"ISBT": 2, "Kargi Chowk": 5, "Balliwala": 6, "GEHU": 1},
+    "Balliwala":     {"Subhash Nagar": 6, "Prem Nagar": 8, "GEHU": 8},
+    "Clock Tower":   {"ISBT": 8, "Prem Nagar": 9},
+    "Prem Nagar":    {"Balliwala": 8, "Clock Tower": 9, "GEHU": 3},
+    "GEHU":          {"Prem Nagar": 3, "Balliwala": 6, "Subhash Nagar": 1},
 }
 
 

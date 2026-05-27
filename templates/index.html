@@ -11,7 +11,7 @@
   <header class="topbar">
     <div class="brand">
       <span class="logo-dot"></span>
-      <span class="brand-name">UniRide</span>
+      <a href="/" style="text-decoration:none;color:inherit"><span class="brand-name">UniRide</span></a>
     </div>
     <nav class="nav">
       <a href="/" class="active">Home</a>
@@ -37,17 +37,10 @@
       <!-- ========== Find Ride ========== -->
       <div class="tab-content" id="tab-find">
         <div class="form-grid">
-          <div class="field">
+          <div class="field" style="position:relative">
             <label>Your Location</label>
-            <select id="find-source">
-              <option value="">Select pickup point</option>
-              <option>Kargi Chowk</option>
-              <option>ISBT</option>
-              <option>Subhash Nagar</option>
-              <option>Balliwala</option>
-              <option>Clock Tower</option>
-              <option>Prem Nagar</option>
-            </select>
+            <input type="text" id="find-source" placeholder="Type your area e.g. ISBT, Prem…" autocomplete="off" />
+            <ul id="find-source-suggestions" class="suggestions-list"></ul>
           </div>
           <div class="field">
             <label>Destination</label>
