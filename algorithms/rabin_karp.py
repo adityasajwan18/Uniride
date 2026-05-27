@@ -53,4 +53,16 @@ def rabin_karp_search(text: str, pattern: str) -> bool:
 
 def match_locality(user_input: str, ride_source: str) -> bool:
     """High-level wrapper used by the ride finder."""
-    return rabin_karp_search(ride_source, user_input)
+    return (rabin_karp_search(ride_source, user_input) or
+            rabin_karp_search(user_input, ride_source))
+
+
+def suggest_locations(user_input: str, all_locations: list) -> list:
+    """
+    Return locations from all_locations whose name contains user_input
+    (Rabin-Karp substring search). Used for live autocomplete.
+    """
+    if not user_input or not user_input.strip():
+        return all_locations
+    return [loc for loc in all_locations
+            if rabin_karp_search(loc, user_input.strip())]

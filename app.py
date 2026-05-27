@@ -2,7 +2,7 @@ from flask import Flask, render_template, request, jsonify
 import mysql.connector
 from mysql.connector import Error
 
-from algorithms.rabin_karp import match_locality
+from algorithms.rabin_karp import match_locality, suggest_locations
 from algorithms.merge_sort import merge_sort_rides
 from algorithms.dijkstra import shortest_route, DEHRADUN_GRAPH
 from algorithms.hashing import RideHashIndex
@@ -10,6 +10,8 @@ from algorithms.priority_queue import nearest_rides
 from algorithms.greedy import greedy_best_rides
 
 app = Flask(__name__)
+
+ALL_LOCATIONS = list(DEHRADUN_GRAPH.keys())
 
 # ---------- MySQL Config ----------
 DB_CONFIG = {
@@ -57,6 +59,16 @@ def dashboard():
 @app.route("/route")
 def route_page():
     return render_template("route.html", graph=DEHRADUN_GRAPH)
+
+
+# ============================================================
+# API: Location Autocomplete (Rabin-Karp powered)
+# ============================================================
+@app.route("/suggest-locations")
+def suggest_locations_api():
+    query = request.args.get("q", "").strip()
+    suggestions = suggest_locations(query, ALL_LOCATIONS)
+    return jsonify({"suggestions": suggestions})
 
 
 # ============================================================
@@ -120,18 +132,62 @@ def find_rides():
     index = RideHashIndex()
     index.build(all_rides)
 
-    # 2. Rabin-Karp locality filter
-    matched = [r for r in all_rides if match_locality(user_source, r["source"])]
+    # 2. Hash index first — O(1) exact source lookup
+    exact_matches = index.get_by_source(user_source)
+
+    # 3. For rides not caught by hash, use Rabin-Karp fuzzy match + path-through
+    #    Hash handles exact matches cheaply; Rabin-Karp only runs
+    #    on the remaining rides — not the full list every time.
+    exact_ids = {r["id"] for r in exact_matches}
+    remaining = [r for r in all_rides if r["id"] not in exact_ids]
+
+    fuzzy_matches = []
+    for ride in remaining:
+        route_info   = shortest_route(ride["source"], destination)
+        path         = route_info["path"]
+
+        # Check A: Rabin-Karp locality match on the ride's starting source
+        source_match = match_locality(user_source, ride["source"])
+
+        # Check B: user's typed location appears anywhere in Dijkstra path
+        #          (meaning the ride physically passes through their area)
+        path_match   = any(match_locality(user_source, node) for node in path)
+
+        if source_match or path_match:
+            ride["distance"]     = route_info["distance"] or ride["distance"]
+            ride["path"]         = path
+
+            # Find where on the path the user gets picked up
+            ride["pickup_point"] = next(
+                (node for node in path if match_locality(user_source, node)),
+                ride["source"]
+            )
+
+            # Tag how the ride was matched so UI can show it
+            ride["match_type"] = "path"
+            fuzzy_matches.append(ride)
+
+    # Attach route info to exact hash matches
+    for ride in exact_matches:
+        route_info           = shortest_route(ride["source"], destination)
+        ride["distance"]     = route_info["distance"] or ride["distance"]
+        ride["path"]         = route_info["path"]
+        ride["pickup_point"] = ride["source"]
+        ride["match_type"]   = "source"
+
+    matched = exact_matches + fuzzy_matches
+
     if not matched:
-        matched = all_rides  # fallback so user always sees something
+        # Fallback: show all rides sorted
+        for ride in all_rides:
+            route_info           = shortest_route(ride["source"], destination)
+            ride["distance"]     = route_info["distance"] or ride["distance"]
+            ride["path"]         = route_info["path"]
+            ride["pickup_point"] = ride["source"]
+            ride["match_type"]   = "fallback"
+        matched = all_rides
 
-    # 3. Dijkstra — attach optimized route+distance to each ride
-    for ride in matched:
-        route_info = shortest_route(ride["source"], destination)
-        ride["distance"] = route_info["distance"] or ride["distance"]
-        ride["path"] = route_info["path"]
-
-    # 4. Merge sort by distance
+    # 4. Merge sort by distance + time_score
     sorted_rides = merge_sort_rides(matched, key="distance")
 
     # 5. Greedy best-ride ranking on the sorted set
@@ -148,12 +204,12 @@ def find_rides():
         "rides": top_nearest,
         "route": overall_route,
         "algorithms_used": [
-            "Rabin-Karp (locality match)",
-            "Hashing (O(1) ride index)",
-            "Dijkstra (route optimization)",
-            "Merge Sort (distance sort)",
-            "Greedy (best-ride scoring)",
-            "Priority Queue (nearest K)",
+            "Hashing (O(1) exact source lookup)",
+            "Rabin-Karp (fuzzy + path-through match)",
+            "Dijkstra (cached route optimization)",
+            "Merge Sort (distance + time pre-sort)",
+            "Greedy (composite ride scoring)",
+            "Priority Queue (nearest K extraction)",
         ],
     })
 
