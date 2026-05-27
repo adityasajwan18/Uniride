@@ -21,6 +21,7 @@ CREATE TABLE users (
 CREATE TABLE rides (
     id           INT AUTO_INCREMENT PRIMARY KEY,
     driver_name  VARCHAR(100) NOT NULL,
+    contact_number VARCHAR(20),
     source       VARCHAR(100) NOT NULL,
     destination  VARCHAR(100) NOT NULL,
     time         VARCHAR(20)  NOT NULL,

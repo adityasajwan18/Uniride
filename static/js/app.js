@@ -3,11 +3,39 @@
 // =====================================================
 
 document.addEventListener("DOMContentLoaded", () => {
+  initThemeToggle();
   initTabs();
   initFindRide();
   initAddRide();
   initDashboard();
 });
+
+/* ---------------- Theme Toggle (Dark Mode) ---------------- */
+function initThemeToggle() {
+  const toggle = document.getElementById("theme-toggle");
+  if (!toggle) return;
+
+  const savedTheme = localStorage.getItem("theme") || "light";
+  const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+  const initialTheme = savedTheme === "auto" ? (prefersDark ? "dark" : "light") : savedTheme;
+
+  applyTheme(initialTheme);
+
+  toggle.addEventListener("click", () => {
+    const currentTheme = document.documentElement.getAttribute("data-theme") || "light";
+    const newTheme = currentTheme === "light" ? "dark" : "light";
+    applyTheme(newTheme);
+    localStorage.setItem("theme", newTheme);
+  });
+}
+
+function applyTheme(theme) {
+  document.documentElement.setAttribute("data-theme", theme);
+  const icon = document.getElementById("theme-icon");
+  if (icon) {
+    icon.textContent = theme === "dark" ? "Light" : "Dark";
+  }
+}
 
 /* ---------------- Tabs ---------------- */
 function initTabs() {
@@ -168,10 +196,15 @@ function renderRides(data, container) {
       ? `<div class="path-line">${ride.path.join(" → ")}</div>`
       : "";
 
+    const contactDisplay = ride.contact_number
+      ? `<div class="contact-info">📞 <strong>${ride.contact_number}</strong></div>`
+      : "";
+
     html += `
       <div class="ride-card ${isPathMatch ? "ride-path-match" : ""}">
         <div>
           <div class="driver">${ride.driver_name}</div>
+          ${contactDisplay}
           <div class="route-line">${ride.source} → ${ride.destination}</div>
           ${pathDisplay}
           ${pickupLabel}
@@ -198,6 +231,7 @@ function initAddRide() {
   btn.addEventListener("click", async () => {
     const payload = {
       driver_name: document.getElementById("add-driver").value.trim(),
+      contact_number: document.getElementById("add-contact").value.trim(),
       source:      document.getElementById("add-source").value,
       destination: document.getElementById("add-destination").value,
       time:        document.getElementById("add-time").value,
@@ -226,6 +260,7 @@ function initAddRide() {
         feedback.className = "feedback success";
         feedback.textContent = `Ride published successfully · Distance ${data.distance} km`;
         document.getElementById("add-driver").value = "";
+        document.getElementById("add-contact").value = "";
         document.getElementById("add-time").value   = "";
       } else {
         feedback.className = "feedback error";
@@ -256,12 +291,13 @@ async function initDashboard() {
 
     const tbody = document.querySelector("#recent-table tbody");
     if (!data.recent_rides.length) {
-      tbody.innerHTML = `<tr><td colspan="6" class="muted">No rides yet.</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="7" class="muted">No rides yet.</td></tr>`;
       return;
     }
     tbody.innerHTML = data.recent_rides.map(r => `
       <tr>
         <td>${r.driver_name}</td>
+        <td>${r.contact_number || "—"}</td>
         <td>${r.source}</td>
         <td>${r.destination}</td>
         <td>${formatTime(r.time)}</td>

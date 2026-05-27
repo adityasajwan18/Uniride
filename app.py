@@ -31,7 +31,7 @@ def fetch_all_rides():
     try:
         conn = get_db()
         cur = conn.cursor(dictionary=True)
-        cur.execute("SELECT id, driver_name, source, destination, time, seats, distance FROM rides")
+        cur.execute("SELECT id, driver_name, contact_number, source, destination, time, seats, distance FROM rides")
         rides = cur.fetchall()
         cur.close(); conn.close()
         # Normalise time field to string
@@ -78,6 +78,7 @@ def suggest_locations_api():
 def add_ride():
     data = request.get_json(force=True)
     driver = data.get("driver_name", "").strip()
+    contact = data.get("contact_number", "").strip()
     source = data.get("source", "").strip()
     destination = data.get("destination", "GEHU").strip()
     time_val = data.get("time", "").strip()
@@ -94,9 +95,9 @@ def add_ride():
         conn = get_db()
         cur = conn.cursor()
         cur.execute(
-            """INSERT INTO rides (driver_name, source, destination, time, seats, distance)
-               VALUES (%s, %s, %s, %s, %s, %s)""",
-            (driver, source, destination, time_val, seats, distance),
+            """INSERT INTO rides (driver_name, contact_number, source, destination, time, seats, distance)
+               VALUES (%s, %s, %s, %s, %s, %s, %s)""",
+            (driver, contact, source, destination, time_val, seats, distance),
         )
         conn.commit()
         ride_id = cur.lastrowid
@@ -226,8 +227,8 @@ def stats():
         total = cur.fetchone()["total"]
         cur.execute("SELECT COUNT(DISTINCT source) AS routes FROM rides")
         routes = cur.fetchone()["routes"]
-        cur.execute("""SELECT id, driver_name, source, destination, time, seats, distance
-                       FROM rides ORDER BY created_at DESC LIMIT 6""")
+        cur.execute("""SELECT id, driver_name, contact_number, source, destination, time, seats, distance
+                       FROM rides ORDER BY id DESC LIMIT 6""")
         recent = cur.fetchall()
         for r in recent:
             r["time"] = str(r["time"])
